@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import smartcommerce.dto.ProductDTO;
 import smartcommerce.dto.RecommendationRequest;
 import smartcommerce.model.Product;
 import smartcommerce.model.User;
@@ -46,6 +47,11 @@ public class ProductController {
 	    public List<Product> getByCategory(@PathVariable Long categoryId) {
 	        return productService.getByCategoryId(categoryId);
 	    }
+	 @PreAuthorize("hasRole('ADMIN')")
+	 @GetMapping("/admin")
+	 public List<Product> getAllAdminProducts() {
+	     return productService.getAll();
+	 }
 	 @PreAuthorize("hasRole('ADMIN')")
 	 @PostMapping("/admin")
 	    public Product create(@RequestBody Product product) {
@@ -85,14 +91,26 @@ public class ProductController {
 	    public ResponseEntity<List<Product>> getFeaturedProducts() {
 	        return ResponseEntity.ok(productService.getFeaturedProducts());
 	    }
+//	 @GetMapping
+//	 public ResponseEntity<List<Product>> getAllProducts(
+//	         @RequestParam(required = false) String category) {
+//		// System.err.println(">>> category param: " + category);
+//		 if (category != null && !category.isBlank()) {
+//	         return ResponseEntity.ok(productService.getByCategory(category));
+//	     }
+//	     return ResponseEntity.ok(productService.getAll());
+//	 }
 	 @GetMapping
-	 public ResponseEntity<List<Product>> getAllProducts(
-	         @RequestParam(required = false) String category) {
-		// System.err.println(">>> category param: " + category);
-		 if (category != null && !category.isBlank()) {
-	         return ResponseEntity.ok(productService.getByCategory(category));
-	     }
-	     return ResponseEntity.ok(productService.getAll());
+	 public ResponseEntity<List<ProductDTO>> getFilteredProducts(
+	     @RequestParam(required = false) String category,
+	     @RequestParam(required = false) List<String> subCategories,
+	     @RequestParam(required = false) String search
+	 )
+ {
+
+	     List<ProductDTO> products = productService.getProductsByCategoryAndSubCategories(category, subCategories, search);
+	     return ResponseEntity.ok(products);
 	 }
+
 
 }

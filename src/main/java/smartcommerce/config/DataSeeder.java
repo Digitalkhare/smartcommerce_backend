@@ -24,6 +24,7 @@ import smartcommerce.model.OrderItem;
 import smartcommerce.model.Product;
 import smartcommerce.model.Review;
 import smartcommerce.model.Role;
+import smartcommerce.model.SubCategory;
 import smartcommerce.model.User;
 import smartcommerce.repository.CartItemRepository;
 import smartcommerce.repository.CartRepository;
@@ -32,6 +33,7 @@ import smartcommerce.repository.OrderItemRepository;
 import smartcommerce.repository.OrderRepository;
 import smartcommerce.repository.ProductRepository;
 import smartcommerce.repository.ReviewRepository;
+import smartcommerce.repository.SubCategoryRepository;
 import smartcommerce.repository.UserRepository;
 
 
@@ -50,6 +52,8 @@ public class DataSeeder implements CommandLineRunner {
     private final OrderItemRepository orderItemRepo;
     private final ReviewRepository reviewRepo;
     private final PasswordEncoder passwordEncoder;
+    private final SubCategoryRepository subCategoryRepo;
+
 
     private final Random random = new Random();
     private final Faker faker = new Faker();
@@ -94,16 +98,39 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // CATEGORIES
+        List<Category> categories = new ArrayList<>();
         String[] catNames = {"Electronics", "Fashion", "Home & Living", "Books", "Sports"};
-        List<Category> categories = Arrays.stream(catNames)
-                .map(name -> categoryRepo.save(new Category(null, name, new ArrayList<>())))
-                .toList();
 
-        // PRODUCTS
+        for (String name : catNames) {
+            Category category = new Category();
+            category.setName(name);
+            category.setProducts(new ArrayList<>()); // Only if needed based on your entity
+            categories.add(categoryRepo.save(category));
+        }
+
+        
+     // Create subcategories for Fashion
+        List<SubCategory> fashionSubs = new ArrayList<>();
+        Category fashionCategory = categories.stream()
+                .filter(c -> c.getName().equalsIgnoreCase("Fashion"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Fashion category not found"));
+
+        List<String> fashionSubNames = List.of("Men", "Women", "Boys", "Girls");
+
+        for (String subName : fashionSubNames) {
+            SubCategory sub = new SubCategory();
+            sub.setName(subName);
+            sub.setCategory(fashionCategory);
+            fashionSubs.add(subCategoryRepo.save(sub));
+        }
+
+     // PRODUCTS
         List<Product> products = new ArrayList<>();
         for (int i = 1; i <= 50; i++) {
             Category category = categories.get(random.nextInt(categories.size()));
             Product product = new Product();
+
             List<String> namePool = categoryProductNames.get(category.getName());
             String name = namePool.get(random.nextInt(namePool.size()));
             product.setName(name);
@@ -116,21 +143,21 @@ public class DataSeeder implements CommandLineRunner {
                 case "Sports" -> "Ideal gear for training and performance.";
                 default -> faker.lorem().sentence();
             };
-            product.setDescription(description);
 
-           // product.setName(faker.commerce().productName());
-           // product.setDescription(faker.lorem().sentence(8));
+            product.setDescription(description);
             product.setPrice(Double.parseDouble(faker.commerce().price(10.0, 500.0)));
             product.setStock(10 + random.nextInt(100));
-            
-            String imageUrl = "https://placehold.co/200x150?text="+category.getName().replace(" ", "+")+"+"+i;
-            product.setImageUrl(imageUrl);
+            product.setImageUrl("https://placehold.co/200x150?text=" + category.getName().replace(" ", "+") + "+" + i);
             product.setCategory(category);
             product.setFeatured(random.nextBoolean() && random.nextInt(3) == 0);
-            
-            products.add(productRepo.save(product));    
 
+            if (category.getName().equalsIgnoreCase("Fashion")) {
+                product.setSubCategory(fashionSubs.get(random.nextInt(fashionSubs.size())));
+            }
+
+            products.add(productRepo.save(product));
         }
+
 //        for (Product p : products) { // randomly select feature product
 //        	boolean featured = random.nextBoolean() && random.nextInt(3) == 0;
 //            p.setFeatured(featured);

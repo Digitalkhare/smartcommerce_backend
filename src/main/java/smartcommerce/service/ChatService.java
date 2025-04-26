@@ -39,6 +39,7 @@ public class ChatService {
 
     @Value("${openai.api.url}")
     private String apiUrl;
+    boolean greetings;
 
     public String getSmartResponse(String email, String userMessage) {
         User user = userRepo.findByEmail(email).orElseThrow();
@@ -72,6 +73,13 @@ public class ChatService {
 
         StringBuilder systemPrompt = new StringBuilder();
         systemPrompt.append("You are a helpful eCommerce assistant. ");
+        if (!greetings) {
+        	 
+        	systemPrompt.append("if user has not been greeted").append(greetings).append("Greet the user by first and last names. Their name are, ").append(firstName).append(" ").append(lastName).append(". ");
+		      greetings = true;
+        } else {
+			 systemPrompt.append("if user has been greeted").append(greetings).append("donot greet user again");
+		}
        // systemPrompt.append("Greet the user by first and last names. Their name are, ").append(firstName).append(" ").append(lastName).append(". ");
         systemPrompt.append("Introduce yourself as Jessica ");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a");
