@@ -101,7 +101,17 @@
     <artifactId>javafaker</artifactId>
     <version>1.0.2</version>
 </dependency>
+<dependency>
+    <groupId>com.stripe</groupId>
+    <artifactId>stripe-java</artifactId>
+    <version>22.10.0</version> <!-- Or latest -->
+</dependency>
 
+ <!-- WebSocket & Messaging support -->
+ <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+  </dependency>
 	</dependencies>
 
 	<build>

@@ -28,7 +28,8 @@ public class OrderController {
     
     @PostMapping("/place")
     public Order placeOrder(@AuthenticationPrincipal UserDetails user) {
-        return orderService.placeOrder(user.getUsername());
+    	System.err.println("User: " + user.getUsername());
+    	return orderService.placeOrder(user.getUsername());
     }
 
     @GetMapping

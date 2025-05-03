@@ -3,6 +3,7 @@ package smartcommerce.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -43,7 +44,8 @@ public class Order {
 	
 	@ManyToOne
 	@JoinColumn(name = "order_user_id")
-	@JsonIgnore
+	//@JsonIgnore
+	@JsonBackReference
 	private User user;
 	
 	
@@ -52,6 +54,11 @@ public class Order {
 	//@JsonIgnore
 	@JsonManagedReference
 	private List<OrderItem> orderItems;
+	
+	public String getUserFirstName() {
+	    return user != null ? user.getFirstName() : null;
+	}
+
 	
 	 
 	

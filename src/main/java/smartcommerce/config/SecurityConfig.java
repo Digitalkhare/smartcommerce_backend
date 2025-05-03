@@ -35,7 +35,9 @@ public class SecurityConfig {
              .csrf(csrf -> csrf.disable())
              .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
              .authorizeHttpRequests(auth -> auth
-                     .requestMatchers("/api/categories/**", "/api/products/**","/api/reviews/**","/api/cart/add/**","/error", "/api/auth/**").permitAll()
+                     .requestMatchers("/api/categories/**", "/api/products/**","/api/reviews/**","/api/cart/add/**","/error", "/api/auth/**","/api/stripe/**","/ws/**",                 // ✅ allow WebSocket connections
+                             "/topic/**",
+                             "/api/settings/**").permitAll()
                      .requestMatchers("/api/admin/**").hasRole("ADMIN")
                      .anyRequest().authenticated()
              )
@@ -60,6 +62,7 @@ public class SecurityConfig {
      configuration.setAllowedOrigins(List.of("http://localhost:3000"));
      configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
      configuration.setAllowedHeaders(List.of("*"));
+     configuration.setAllowCredentials(true); 
      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
      source.registerCorsConfiguration("/**", configuration);
      return source;
