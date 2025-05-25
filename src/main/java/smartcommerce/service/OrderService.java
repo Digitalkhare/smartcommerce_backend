@@ -2,8 +2,11 @@ package smartcommerce.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import smartcommerce.model.Cart;
@@ -25,8 +28,10 @@ public class OrderService {
     private final UserRepository userRepo;
     private final CartRepository cartRepo;
     private final CartItemRepository cartItemRepo;
+    private final MailService mailService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public Order placeOrder(String email) {
+    public Order placeOrder(String email, String paymentIntentId) {
         User user = userRepo.findByEmail(email).orElseThrow();
         Cart cart = cartRepo.findByUser(user).orElseThrow();
         List<CartItem> items = cartItemRepo.findByCart(cart);
@@ -42,6 +47,7 @@ public class OrderService {
         order.setStatus("PENDING");
         order.setTotalAmount(total);
         order.setOrderDateTime(LocalDateTime.now());
+        order.setPaymentReference(paymentIntentId); // new
         order = orderRepo.save(order);
 
         for (CartItem item : items) {
@@ -54,6 +60,18 @@ public class OrderService {
         }
 
         cartItemRepo.deleteAll(items);
+        // Format summary HTML
+        String summaryHtml = items.stream()
+                .map(i -> "<p>" + i.getProduct().getName() + " × " + i.getQuantity() + "</p>")
+                .collect(Collectors.joining());
+
+        // Send confirmation email
+        mailService.sendOrderConfirmationHtml(
+                user.getEmail(),
+                user.getFirstName()+" "+user.getLastName(),
+                order.getId().toString(),
+                summaryHtml
+        );
         return order;
     }
 
@@ -77,6 +95,25 @@ public class OrderService {
             .distinct()
             .toList();
     }
+    @Transactional
+    public Order updateOrderStatus(Long orderId, String newStatus) {
+        //Order order = orderRepo.findById(orderId)
+    	Order order = orderRepo.findByIdWithUser(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepo.save(order);
+
+        // 🚀 Send WebSocket message to client
+        messagingTemplate.convertAndSend(
+            "/topic/orders/" + order.getUser().getId(), // e.g., user-specific channel
+            updatedOrder
+        );
+       // System.err.println("Sending update to /topic/orders/" + order.getUser().getId());
+
+
+        return updatedOrder;
+    }
+
 
 
 }

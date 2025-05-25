@@ -263,7 +263,7 @@ public class DataSeeder implements CommandLineRunner {
                 .minusMinutes(random.nextInt(60));
     }
     private String randomOrderStatus() {
-        return List.of("PENDING", "SHIPPED", "DELIVERED", "CANCELLED").get(random.nextInt(4));
+        return List.of("Pending", "Shipped", "Delivered", "Cancelled").get(random.nextInt(4));
     }
 }
 

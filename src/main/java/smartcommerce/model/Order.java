@@ -36,6 +36,7 @@ public class Order {
 	//private Date orderDate = new Date();
 	private LocalDateTime orderDateTime;
 	private double totalAmount;
+	private String paymentReference; // Stripe PaymentIntent ID (optional)
 	
 	@PrePersist  //autosets time just before persisting
     protected void onCreate() {
@@ -58,6 +59,10 @@ public class Order {
 	public String getUserFirstName() {
 	    return user != null ? user.getFirstName() : null;
 	}
+	public Long getUserId() {
+	    return user != null ? user.getId() : null;
+	}
+
 
 	
 	 
