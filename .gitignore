@@ -34,3 +34,10 @@ build/
 
 # Ignore Spring Boot config
 src/main/resources/application.properties
+
+# Oracle Wallet
+wallet/
+*.p12
+*.pem
+*.key
+
