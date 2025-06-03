@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import smartcommerce.dto.ProductDTO;
+import smartcommerce.model.Category;
 import smartcommerce.model.Product;
 import smartcommerce.model.Review;
+import smartcommerce.repository.CatergoryRepository;
 import smartcommerce.repository.ProductRepository;
 import smartcommerce.repository.ReviewRepository;
 
@@ -18,6 +20,7 @@ import smartcommerce.repository.ReviewRepository;
 public class ProductService {
 	final ProductRepository productRepository;
 	final ReviewRepository reviewRepo;
+	final CatergoryRepository catergoryRepository;
 
 	public List<Product> getAll() {
 		return productRepository.findAll();
@@ -31,8 +34,20 @@ public class ProductService {
 		return productRepository.findByCategoryId(categoryId);
 	}
 
+//	public Product create(Product product) {
+//		return productRepository.save(product);
+//	}
 	public Product create(Product product) {
-		return productRepository.save(product);
+	    if (product.getCategory() == null || product.getCategory().getId() == null) {
+	        throw new IllegalArgumentException("Product must include a valid category ID");
+	    }
+
+	    // Fetch a managed Category entity
+	    Category category = catergoryRepository.findById(product.getCategory().getId())
+	        .orElseThrow(() -> new RuntimeException("Category not found"));
+
+	    product.setCategory(category);
+	    return productRepository.save(product);
 	}
 
 	public Product update(Long id, Product product) {

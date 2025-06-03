@@ -23,12 +23,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		        User user = userRepository.findByEmail(email)
 		                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		        return new org.springframework.security.core.userdetails.User(
-		                user.getEmail(),
-		                user.getPassword(),
-		                user.getRole().name().equals("ADMIN")
-		                        ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-		                        : List.of(new SimpleGrantedAuthority("ROLE_USER"))
-		        );
+		        	    user.getEmail(),
+		        	    user.getPassword(),
+		        	    user.isEnabled(),     // enabled
+		        	    true,                 // accountNonExpired
+		        	    true,                 // credentialsNonExpired
+		        	    true,                 // accountNonLocked
+		        	    user.getRole().name().equals("ADMIN")
+		        	        ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+		        	        : List.of(new SimpleGrantedAuthority("ROLE_USER"))
+		        	);
+
 	}
 		 
 		    public User findByEmail(String email) {
@@ -39,6 +44,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		    public List<User> findAllUsers() {
 		        return userRepository.findAll();
 		    }
+		    public void deleteUserById(Long id) {
+		        userRepository.deleteById(id);
+		    }
+		    public void updateUserStatus(Long id, String status) {
+		        User user = userRepository.findById(id)
+		            .orElseThrow(() -> new RuntimeException("User not found"));
+
+		        user.setEnabled("active".equalsIgnoreCase(status));
+		        userRepository.save(user);
+		    }
+
+
 
 
 }

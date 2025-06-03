@@ -1,6 +1,7 @@
 package smartcommerce.dto;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class UserDto {
@@ -10,8 +11,5 @@ public class UserDto {
     private String email;
     private String role;
     private String status;
-//	public void setStatus(String status) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+    private List<OrderDto> orders;
 }

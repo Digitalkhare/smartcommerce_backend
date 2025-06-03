@@ -152,6 +152,7 @@ public class ChatService {
             Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
             return message.get("content").toString();
         } catch (Exception e) {
+        	e.printStackTrace();
             return "Sorry, I'm having trouble accessing your data right now.";
         }
     }
