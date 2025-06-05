@@ -66,7 +66,8 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepo.count() > 0) return; // Avoid reseeding
+       // if (userRepo.count() > 0) return; // Avoid reseeding
+        if (true) return; // Avoid reseeding
 
         // USERS
         List<User> users = new ArrayList<>();

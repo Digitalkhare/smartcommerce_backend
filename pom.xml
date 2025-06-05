@@ -24,6 +24,14 @@
         <heroku.appName>smartcommerce-backend</heroku.appName>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>oracle</id>
+            <name>Oracle Maven Repository</name>
+            <url>https://maven.oracle.com</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- Spring Boot Starters -->
         <dependency>
@@ -63,11 +71,19 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Database Driver -->
+        <!-- Oracle JDBC Driver (secured via Oracle Maven auth) -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc11</artifactId>
+            <version>23.8.0.25.04</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Hibernate Dialects for Oracle -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <version>6.6.8.Final</version>
         </dependency>
 
         <!-- JWT -->
@@ -114,7 +130,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.30</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Testing -->
@@ -128,8 +145,23 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+        <dependency>
+    <groupId>com.oracle.database.security</groupId>
+    <artifactId>oraclepki</artifactId>
+    <version>21.3.0.0</version>
+</dependency>
+<dependency>
+    <groupId>com.oracle.database.security</groupId>
+    <artifactId>osdt_core</artifactId>
+    <version>21.3.0.0</version>
+</dependency>
+<dependency>
+    <groupId>com.oracle.database.security</groupId>
+    <artifactId>osdt_cert</artifactId>
+    <version>21.3.0.0</version>
+</dependency>
 
+    </dependencies>
     <build>
         <plugins>
             <!-- Compiler Plugin -->
